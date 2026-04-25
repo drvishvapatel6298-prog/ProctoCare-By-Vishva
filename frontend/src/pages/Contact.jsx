@@ -59,7 +59,8 @@ export default function Contact() {
                         <h3 className="font-serif text-lg font-semibold text-brand-text mt-3">Clinic Location</h3>
                         {hasAddress ? (
                             <>
-                                {settings.address_line1 && <p className="text-sm text-brand-text mt-2 leading-relaxed">{settings.address_line1}</p>}
+                                {settings.clinic_name && <p className="font-serif text-base text-brand-primary font-semibold mt-2">{settings.clinic_name}</p>}
+                                {settings.address_line1 && <p className="text-sm text-brand-text mt-1 leading-relaxed">{settings.address_line1}</p>}
                                 {settings.address_line2 && <p className="text-sm text-brand-text leading-relaxed">{settings.address_line2}</p>}
                                 {settings.landmark && <p className="text-sm text-brand-textSecondary leading-relaxed mt-1">{settings.landmark}</p>}
                                 {(settings.city || settings.state || settings.pincode) && (
@@ -74,7 +75,10 @@ export default function Contact() {
                                 )}
                             </>
                         ) : (
-                            <p className="text-sm text-brand-textSecondary mt-2 leading-relaxed">Detailed clinic address coming soon.</p>
+                            <>
+                                {settings?.clinic_name && <p className="font-serif text-base text-brand-primary font-semibold mt-2">{settings.clinic_name}</p>}
+                                <p className="text-sm text-brand-textSecondary mt-2 leading-relaxed">Detailed clinic address coming soon.</p>
+                            </>
                         )}
                         {settings?.maps_embed_url ? (
                             <div className="mt-4 aspect-[4/3] rounded-xl overflow-hidden border border-brand-primary/10">
