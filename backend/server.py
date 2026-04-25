@@ -8,7 +8,7 @@ import uuid
 import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 import bcrypt
 import jwt
@@ -106,7 +106,7 @@ class Appointment(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class AppointmentUpdate(BaseModel):
-    status: Optional[str] = None
+    status: Optional[Literal["pending", "approved", "rescheduled", "cancelled"]] = None
     preferred_date: Optional[str] = None
     time_slot: Optional[str] = None
     notes: Optional[str] = None
