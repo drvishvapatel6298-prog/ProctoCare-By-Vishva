@@ -71,8 +71,8 @@ export default function Home() {
                         <div className="relative">
                             <div className="absolute -inset-4 bg-brand-accent/20 rounded-3xl rotate-3" />
                             <img
-                                src="https://images.pexels.com/photos/7578808/pexels-photo-7578808.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-                                alt="Doctor consulting patient"
+                                src="https://customer-assets.emergentagent.com/job_vishva-proctology/artifacts/k64gpu3c_WhatsApp%20Image%202026-04-25%20at%209.09.47%20PM.jpeg"
+                                alt="Dr. Vishva Patel"
                                 className="relative rounded-3xl shadow-2xl object-cover w-full h-[480px]"
                             />
                             <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 max-w-[220px] border border-brand-primary/5">
