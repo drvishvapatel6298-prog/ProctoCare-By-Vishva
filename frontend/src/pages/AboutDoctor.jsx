@@ -12,6 +12,7 @@ export default function AboutDoctor() {
                             src="https://customer-assets.emergentagent.com/job_vishva-proctology/artifacts/k64gpu3c_WhatsApp%20Image%202026-04-25%20at%209.09.47%20PM.jpeg"
                             alt="Dr. Vishva Patel"
                             className="relative w-full h-[560px] object-cover rounded-3xl shadow-xl"
+                            style={{ objectPosition: "center 25%" }}
                         />
                     </div>
                 </div>

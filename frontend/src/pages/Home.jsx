@@ -73,7 +73,8 @@ export default function Home() {
                             <img
                                 src="https://customer-assets.emergentagent.com/job_vishva-proctology/artifacts/k64gpu3c_WhatsApp%20Image%202026-04-25%20at%209.09.47%20PM.jpeg"
                                 alt="Dr. Vishva Patel"
-                                className="relative rounded-3xl shadow-2xl object-cover w-full h-[480px]"
+                                className="relative rounded-3xl shadow-2xl object-cover object-top w-full h-[480px]"
+                                style={{ objectPosition: "center 20%" }}
                             />
                             <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 max-w-[220px] border border-brand-primary/5">
                                 <div className="flex items-center gap-1 text-brand-accentDark mb-2">
