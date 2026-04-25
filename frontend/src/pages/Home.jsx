@@ -55,8 +55,8 @@ export default function Home() {
                         </div>
                         <div className="mt-12 grid grid-cols-3 gap-6 max-w-lg">
                             {[
-                                { n: "12+", l: "Years Specialist Experience" },
-                                { n: "5,000+", l: "Patients Treated" },
+                                { n: "3+", l: "Years Specialist Experience" },
+                                { n: "3,000+", l: "Patients Treated" },
                                 { n: "98%", l: "Patient Satisfaction" },
                             ].map((s) => (
                                 <div key={s.l}>
