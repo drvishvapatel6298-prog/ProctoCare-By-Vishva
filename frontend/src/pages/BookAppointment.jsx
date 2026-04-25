@@ -7,11 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { toast } from "sonner";
 import api, { formatApiError } from "../lib/api";
 
-const services = [
-    "Piles Consultation", "Fissure Consultation", "Fistula Consultation",
-    "Laser Treatment Inquiry", "General Proctology Consultation", "Online Consultation",
-];
-
 export default function BookAppointment() {
     const navigate = useNavigate();
     const [date, setDate] = useState();
@@ -21,7 +16,7 @@ export default function BookAppointment() {
     const [confirmation, setConfirmation] = useState(null);
     const [form, setForm] = useState({
         patient_name: "", contact_number: "", email: "",
-        time_slot: "", service: services[0], consultation_type: "in-clinic", notes: "",
+        time_slot: "", consultation_type: "in-clinic", notes: "",
     });
 
     useEffect(() => {
@@ -40,7 +35,8 @@ export default function BookAppointment() {
         if (!form.time_slot) return toast.error("Please select a time slot");
         setSubmitting(true);
         try {
-            const payload = { ...form, preferred_date: format(date, "yyyy-MM-dd") };
+            const service = form.consultation_type === "online" ? "Online Consultation" : "In-Clinic Consultation";
+            const payload = { ...form, service, preferred_date: format(date, "yyyy-MM-dd") };
             if (!payload.email) delete payload.email;
             const { data } = await api.post("/appointments", payload);
             setConfirmation(data);
@@ -109,25 +105,22 @@ export default function BookAppointment() {
                         className="input-base" data-testid="input-email" placeholder="you@example.com" />
                 </Field>
 
-                <Field label="Service *">
-                    <select required value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })}
-                        className="input-base" data-testid="select-service">
-                        {services.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                </Field>
-
                 <Field label="Consultation Type *">
                     <div className="grid grid-cols-2 gap-3">
-                        {["in-clinic", "online"].map((opt) => (
-                            <button key={opt} type="button"
-                                onClick={() => setForm({ ...form, consultation_type: opt })}
-                                data-testid={`type-${opt}`}
-                                className={`rounded-xl border p-4 text-sm font-medium transition-colors ${
-                                    form.consultation_type === opt
+                        {[
+                            { id: "in-clinic", label: "In-Clinic Consultation", sub: "Visit the clinic in person" },
+                            { id: "online", label: "Online Consultation", sub: "Video call from your home" },
+                        ].map((opt) => (
+                            <button key={opt.id} type="button"
+                                onClick={() => setForm({ ...form, consultation_type: opt.id })}
+                                data-testid={`type-${opt.id}`}
+                                className={`rounded-xl border p-4 text-left transition-colors ${
+                                    form.consultation_type === opt.id
                                         ? "bg-brand-primary text-white border-brand-primary"
                                         : "bg-white text-brand-text border-brand-primary/15 hover:border-brand-primary/40"
                                 }`}>
-                                {opt === "in-clinic" ? "In-Clinic Visit" : "Online Consultation"}
+                                <div className="text-sm font-semibold">{opt.label}</div>
+                                <div className={`text-xs mt-0.5 ${form.consultation_type === opt.id ? "text-white/70" : "text-brand-textMuted"}`}>{opt.sub}</div>
                             </button>
                         ))}
                     </div>
