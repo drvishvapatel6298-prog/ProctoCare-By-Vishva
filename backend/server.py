@@ -143,6 +143,33 @@ class ClinicSettings(BaseModel):
     contact_email: str = "drvishvapatel6298@gmail.com"
 
 
+class BlogPostCreate(BaseModel):
+    title: str
+    excerpt: str
+    category: str
+    cover: str
+    content_html: str
+    slug: Optional[str] = None
+    read_time: Optional[str] = "5 min read"
+
+class BlogPostUpdate(BaseModel):
+    title: Optional[str] = None
+    excerpt: Optional[str] = None
+    category: Optional[str] = None
+    cover: Optional[str] = None
+    content_html: Optional[str] = None
+    slug: Optional[str] = None
+    read_time: Optional[str] = None
+
+
+import re
+def _slugify(s: str) -> str:
+    s = s.lower().strip()
+    s = re.sub(r"[^\w\s-]", "", s)
+    s = re.sub(r"[\s_-]+", "-", s)
+    return s.strip("-") or "post"
+
+
 # ---------- Email ----------
 def _build_patient_email(appt: dict) -> str:
     return f"""
@@ -322,14 +349,57 @@ async def get_testimonials():
 
 @api.get("/blog")
 async def get_blog():
-    return [{k: v for k, v in p.items() if k != "content_html"} for p in BLOG_POSTS]
+    posts = await db.blog_posts.find({}, {"_id": 0, "content_html": 0}).sort("created_at", -1).to_list(500)
+    return posts
 
 @api.get("/blog/{slug}")
 async def get_blog_post(slug: str):
-    for p in BLOG_POSTS:
-        if p["slug"] == slug:
-            return p
-    raise HTTPException(404, "Post not found")
+    post = await db.blog_posts.find_one({"slug": slug}, {"_id": 0})
+    if not post:
+        raise HTTPException(404, "Post not found")
+    return post
+
+@api.post("/blog", response_model=None)
+async def create_blog_post(payload: BlogPostCreate, user=Depends(get_current_admin)):
+    slug = (payload.slug or _slugify(payload.title)).strip().lower()
+    if await db.blog_posts.find_one({"slug": slug}, {"_id": 0}):
+        raise HTTPException(409, "A post with this slug already exists")
+    doc = {
+        "id": str(uuid.uuid4()),
+        "slug": slug,
+        "title": payload.title,
+        "excerpt": payload.excerpt,
+        "category": payload.category,
+        "read_time": payload.read_time or "5 min read",
+        "cover": payload.cover,
+        "content_html": payload.content_html,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.blog_posts.insert_one(doc.copy())
+    doc.pop("_id", None)
+    return doc
+
+@api.patch("/blog/{post_id}")
+async def update_blog_post(post_id: str, payload: BlogPostUpdate, user=Depends(get_current_admin)):
+    update = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(400, "No changes provided")
+    if "slug" in update:
+        update["slug"] = update["slug"].strip().lower()
+        clash = await db.blog_posts.find_one({"slug": update["slug"], "id": {"$ne": post_id}}, {"_id": 0})
+        if clash:
+            raise HTTPException(409, "A post with this slug already exists")
+    result = await db.blog_posts.update_one({"id": post_id}, {"$set": update})
+    if result.matched_count == 0:
+        raise HTTPException(404, "Post not found")
+    return await db.blog_posts.find_one({"id": post_id}, {"_id": 0})
+
+@api.delete("/blog/{post_id}")
+async def delete_blog_post(post_id: str, user=Depends(get_current_admin)):
+    result = await db.blog_posts.delete_one({"id": post_id})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Post not found")
+    return {"success": True}
 
 @api.get("/time-slots")
 async def get_time_slots(date: str):
@@ -454,13 +524,20 @@ async def admin_stats(user=Depends(get_current_admin)):
     contacts = await db.contact_messages.count_documents({})
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     today_count = await db.appointments.count_documents({"preferred_date": today})
+    blog_count = await db.blog_posts.count_documents({})
     return {
         "total_appointments": total,
         "pending": pending,
         "approved": approved,
         "today": today_count,
         "contact_messages": contacts,
+        "blog_posts": blog_count,
     }
+
+@api.get("/admin/blog")
+async def admin_list_blog(user=Depends(get_current_admin)):
+    posts = await db.blog_posts.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return posts
 
 
 app.include_router(api)
@@ -500,8 +577,20 @@ async def startup():
     try:
         await db.users.create_index("email", unique=True)
         await db.appointments.create_index("preferred_date")
+        await db.blog_posts.create_index("slug", unique=True)
     except Exception as e:
         logger.warning(f"Index creation warning: {e}")
+
+    # Seed blog posts if collection is empty
+    if await db.blog_posts.count_documents({}) == 0:
+        for p in BLOG_POSTS:
+            doc = {
+                "id": str(uuid.uuid4()),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                **p,
+            }
+            await db.blog_posts.insert_one(doc.copy())
+        logger.info(f"Seeded {len(BLOG_POSTS)} blog posts")
 
 
 @app.on_event("shutdown")
