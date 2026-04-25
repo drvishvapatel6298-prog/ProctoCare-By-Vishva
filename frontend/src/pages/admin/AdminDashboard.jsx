@@ -1,11 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { LogOut, Calendar, CheckCircle2, Clock, MessageSquare, Trash2, Check, Loader2, RefreshCw, Settings, Newspaper } from "lucide-react";
+import { LogOut, Calendar, CheckCircle2, Clock, MessageSquare, Trash2, Check, Loader2, RefreshCw, Settings, Newspaper, Briefcase, HelpCircle, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
 import api, { formatApiError } from "../../lib/api";
 import { ClinicSettingsTab } from "./ClinicSettingsTab";
 import { BlogManagerTab } from "./BlogManagerTab";
+import { ServicesManagerTab } from "./ServicesManagerTab";
+import { FAQsManagerTab } from "./FAQsManagerTab";
+import { TestimonialsManagerTab } from "./TestimonialsManagerTab";
 
 const STATUS_COLORS = {
     pending: "bg-amber-50 text-amber-700 border-amber-200",
@@ -106,8 +109,11 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-1 mt-10 border-b border-brand-primary/10 overflow-x-auto">
                     {[
                         { id: "appointments", label: "Appointments" },
-                        { id: "messages", label: "Contact Messages" },
-                        { id: "blog", label: "Blog Posts", Icon: Newspaper },
+                        { id: "messages", label: "Messages" },
+                        { id: "blog", label: "Blog", Icon: Newspaper },
+                        { id: "services", label: "Services", Icon: Briefcase },
+                        { id: "faqs", label: "FAQs", Icon: HelpCircle },
+                        { id: "testimonials", label: "Testimonials", Icon: Star },
                         { id: "settings", label: "Clinic Settings", Icon: Settings },
                     ].map((t) => (
                         <button key={t.id} onClick={() => setTab(t.id)} data-testid={`admin-tab-${t.id}`}
@@ -215,6 +221,9 @@ export default function AdminDashboard() {
                 )}
 
                 {tab === "blog" && <BlogManagerTab />}
+                {tab === "services" && <ServicesManagerTab />}
+                {tab === "faqs" && <FAQsManagerTab />}
+                {tab === "testimonials" && <TestimonialsManagerTab />}
                 {tab === "settings" && <ClinicSettingsTab />}
             </main>
         </div>

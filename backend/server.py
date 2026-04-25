@@ -162,6 +162,51 @@ class BlogPostUpdate(BaseModel):
     read_time: Optional[str] = None
 
 
+class ServiceCreate(BaseModel):
+    title: str
+    icon: str = "Sparkles"
+    image: str = ""
+    summary: str
+    details: List[str] = []
+    slug: Optional[str] = None
+
+class ServiceUpdate(BaseModel):
+    title: Optional[str] = None
+    icon: Optional[str] = None
+    image: Optional[str] = None
+    summary: Optional[str] = None
+    details: Optional[List[str]] = None
+    slug: Optional[str] = None
+
+
+class FAQCreate(BaseModel):
+    category: str
+    question: str
+    answer: str
+    sort_order: int = 0
+
+class FAQUpdate(BaseModel):
+    category: Optional[str] = None
+    question: Optional[str] = None
+    answer: Optional[str] = None
+    sort_order: Optional[int] = None
+
+
+class TestimonialCreate(BaseModel):
+    name: str
+    city: str = ""
+    rating: int = 5
+    service: str = ""
+    text: str
+
+class TestimonialUpdate(BaseModel):
+    name: Optional[str] = None
+    city: Optional[str] = None
+    rating: Optional[int] = None
+    service: Optional[str] = None
+    text: Optional[str] = None
+
+
 import re
 def _slugify(s: str) -> str:
     s = s.lower().strip()
@@ -330,22 +375,106 @@ BLOG_POSTS = [
 
 @api.get("/services")
 async def get_services():
-    return SERVICES
+    return await db.services.find({}, {"_id": 0}).sort("sort_order", 1).to_list(100)
 
 @api.get("/services/{slug}")
 async def get_service(slug: str):
-    for s in SERVICES:
-        if s["slug"] == slug:
-            return s
-    raise HTTPException(404, "Service not found")
+    s = await db.services.find_one({"slug": slug}, {"_id": 0})
+    if not s:
+        raise HTTPException(404, "Service not found")
+    return s
+
+@api.post("/services")
+async def create_service(payload: ServiceCreate, user=Depends(get_current_admin)):
+    slug = (payload.slug or _slugify(payload.title)).strip().lower()
+    if await db.services.find_one({"slug": slug}, {"_id": 0}):
+        raise HTTPException(409, "A service with this slug already exists")
+    last = await db.services.find_one({}, sort=[("sort_order", -1)])
+    next_order = (last.get("sort_order", 0) + 1) if last else 0
+    doc = {"id": str(uuid.uuid4()), "slug": slug, "sort_order": next_order, **payload.model_dump(exclude={"slug"})}
+    await db.services.insert_one(doc.copy())
+    doc.pop("_id", None)
+    return doc
+
+@api.patch("/services/{service_id}")
+async def update_service(service_id: str, payload: ServiceUpdate, user=Depends(get_current_admin)):
+    update = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(400, "No changes provided")
+    if "slug" in update:
+        update["slug"] = update["slug"].strip().lower()
+        clash = await db.services.find_one({"slug": update["slug"], "id": {"$ne": service_id}}, {"_id": 0})
+        if clash:
+            raise HTTPException(409, "A service with this slug already exists")
+    result = await db.services.update_one({"id": service_id}, {"$set": update})
+    if result.matched_count == 0:
+        raise HTTPException(404, "Service not found")
+    return await db.services.find_one({"id": service_id}, {"_id": 0})
+
+@api.delete("/services/{service_id}")
+async def delete_service(service_id: str, user=Depends(get_current_admin)):
+    result = await db.services.delete_one({"id": service_id})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Service not found")
+    return {"success": True}
 
 @api.get("/faqs")
 async def get_faqs():
-    return FAQS
+    return await db.faqs.find({}, {"_id": 0}).sort("sort_order", 1).to_list(200)
+
+@api.post("/faqs")
+async def create_faq(payload: FAQCreate, user=Depends(get_current_admin)):
+    doc = {"id": str(uuid.uuid4()), **payload.model_dump()}
+    await db.faqs.insert_one(doc.copy())
+    doc.pop("_id", None)
+    return doc
+
+@api.patch("/faqs/{faq_id}")
+async def update_faq(faq_id: str, payload: FAQUpdate, user=Depends(get_current_admin)):
+    update = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(400, "No changes provided")
+    result = await db.faqs.update_one({"id": faq_id}, {"$set": update})
+    if result.matched_count == 0:
+        raise HTTPException(404, "FAQ not found")
+    return await db.faqs.find_one({"id": faq_id}, {"_id": 0})
+
+@api.delete("/faqs/{faq_id}")
+async def delete_faq(faq_id: str, user=Depends(get_current_admin)):
+    result = await db.faqs.delete_one({"id": faq_id})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "FAQ not found")
+    return {"success": True}
 
 @api.get("/testimonials")
 async def get_testimonials():
-    return TESTIMONIALS
+    return await db.testimonials.find({}, {"_id": 0}).sort("sort_order", 1).to_list(100)
+
+@api.post("/testimonials")
+async def create_testimonial(payload: TestimonialCreate, user=Depends(get_current_admin)):
+    last = await db.testimonials.find_one({}, sort=[("sort_order", -1)])
+    next_order = (last.get("sort_order", 0) + 1) if last else 0
+    doc = {"id": str(uuid.uuid4()), "sort_order": next_order, **payload.model_dump()}
+    await db.testimonials.insert_one(doc.copy())
+    doc.pop("_id", None)
+    return doc
+
+@api.patch("/testimonials/{tid}")
+async def update_testimonial(tid: str, payload: TestimonialUpdate, user=Depends(get_current_admin)):
+    update = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(400, "No changes provided")
+    result = await db.testimonials.update_one({"id": tid}, {"$set": update})
+    if result.matched_count == 0:
+        raise HTTPException(404, "Testimonial not found")
+    return await db.testimonials.find_one({"id": tid}, {"_id": 0})
+
+@api.delete("/testimonials/{tid}")
+async def delete_testimonial(tid: str, user=Depends(get_current_admin)):
+    result = await db.testimonials.delete_one({"id": tid})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Testimonial not found")
+    return {"success": True}
 
 @api.get("/blog")
 async def get_blog():
@@ -578,19 +707,37 @@ async def startup():
         await db.users.create_index("email", unique=True)
         await db.appointments.create_index("preferred_date")
         await db.blog_posts.create_index("slug", unique=True)
+        await db.services.create_index("slug", unique=True)
     except Exception as e:
         logger.warning(f"Index creation warning: {e}")
 
     # Seed blog posts if collection is empty
     if await db.blog_posts.count_documents({}) == 0:
         for p in BLOG_POSTS:
-            doc = {
-                "id": str(uuid.uuid4()),
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                **p,
-            }
+            doc = {"id": str(uuid.uuid4()), "created_at": datetime.now(timezone.utc).isoformat(), **p}
             await db.blog_posts.insert_one(doc.copy())
         logger.info(f"Seeded {len(BLOG_POSTS)} blog posts")
+
+    # Seed services if collection is empty
+    if await db.services.count_documents({}) == 0:
+        for i, s in enumerate(SERVICES):
+            doc = {"id": str(uuid.uuid4()), "sort_order": i, **s}
+            await db.services.insert_one(doc.copy())
+        logger.info(f"Seeded {len(SERVICES)} services")
+
+    # Seed FAQs if collection is empty
+    if await db.faqs.count_documents({}) == 0:
+        for i, f in enumerate(FAQS):
+            doc = {"id": str(uuid.uuid4()), "sort_order": i, **f}
+            await db.faqs.insert_one(doc.copy())
+        logger.info(f"Seeded {len(FAQS)} FAQs")
+
+    # Seed testimonials if collection is empty
+    if await db.testimonials.count_documents({}) == 0:
+        for i, t in enumerate(TESTIMONIALS):
+            doc = {"id": str(uuid.uuid4()), "sort_order": i, **t}
+            await db.testimonials.insert_one(doc.copy())
+        logger.info(f"Seeded {len(TESTIMONIALS)} testimonials")
 
 
 @app.on_event("shutdown")
