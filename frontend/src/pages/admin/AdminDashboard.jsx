@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { LogOut, Calendar, CheckCircle2, Clock, MessageSquare, Trash2, Check, Loader2, RefreshCw } from "lucide-react";
+import { LogOut, Calendar, CheckCircle2, Clock, MessageSquare, Trash2, Check, Loader2, RefreshCw, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
 import api, { formatApiError } from "../../lib/api";
+import { ClinicSettingsTab } from "./ClinicSettingsTab";
 
 const STATUS_COLORS = {
     pending: "bg-amber-50 text-amber-700 border-amber-200",
@@ -101,15 +102,16 @@ export default function AdminDashboard() {
                     <Stat Icon={MessageSquare} label="Messages" value={stats?.contact_messages ?? "—"} />
                 </div>
 
-                <div className="flex items-center gap-1 mt-10 border-b border-brand-primary/10">
+                <div className="flex items-center gap-1 mt-10 border-b border-brand-primary/10 overflow-x-auto">
                     {[
                         { id: "appointments", label: "Appointments" },
                         { id: "messages", label: "Contact Messages" },
+                        { id: "settings", label: "Clinic Settings", Icon: Settings },
                     ].map((t) => (
                         <button key={t.id} onClick={() => setTab(t.id)} data-testid={`admin-tab-${t.id}`}
-                            className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                            className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2 whitespace-nowrap ${
                                 tab === t.id ? "border-brand-primary text-brand-primary" : "border-transparent text-brand-textSecondary hover:text-brand-primary"
-                            }`}>{t.label}</button>
+                            }`}>{t.Icon && <t.Icon size={14} />} {t.label}</button>
                     ))}
                 </div>
 
@@ -209,6 +211,8 @@ export default function AdminDashboard() {
                         ))}
                     </div>
                 )}
+
+                {tab === "settings" && <ClinicSettingsTab />}
             </main>
         </div>
     );

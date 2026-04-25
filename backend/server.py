@@ -127,6 +127,22 @@ class ContactMessage(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
+class ClinicSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    clinic_name: str = "ProctoCare by Vishva"
+    tagline: str = "Advanced Proctology Care with Compassion & Trust"
+    address_line1: str = ""
+    address_line2: str = ""
+    landmark: str = ""
+    city: str = ""
+    state: str = ""
+    pincode: str = ""
+    hours: str = ""
+    maps_embed_url: str = ""
+    maps_link: str = ""
+    contact_email: str = "drvishvapatel6298@gmail.com"
+
+
 # ---------- Email ----------
 def _build_patient_email(appt: dict) -> str:
     return f"""
@@ -406,6 +422,23 @@ async def create_contact(payload: ContactCreate):
 async def list_contact(user=Depends(get_current_admin)):
     items = await db.contact_messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return items
+
+
+# ---------- Clinic Settings ----------
+@api.get("/clinic-settings", response_model=ClinicSettings)
+async def get_clinic_settings():
+    doc = await db.clinic_settings.find_one({"_id": "singleton"}, {"_id": 0})
+    return ClinicSettings(**(doc or {}))
+
+@api.put("/clinic-settings", response_model=ClinicSettings)
+async def update_clinic_settings(payload: ClinicSettings, user=Depends(get_current_admin)):
+    doc = payload.model_dump()
+    await db.clinic_settings.update_one(
+        {"_id": "singleton"},
+        {"$set": doc},
+        upsert=True,
+    )
+    return payload
 
 
 # ---------- Health & Stats ----------

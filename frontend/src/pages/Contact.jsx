@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Mail, MapPin, Loader2, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mail, MapPin, Loader2, Check, Clock, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import api, { formatApiError } from "../lib/api";
 
@@ -7,6 +7,11 @@ export default function Contact() {
     const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
     const [submitting, setSubmitting] = useState(false);
     const [done, setDone] = useState(false);
+    const [settings, setSettings] = useState(null);
+
+    useEffect(() => {
+        api.get("/clinic-settings").then(({ data }) => setSettings(data)).catch(() => setSettings({}));
+    }, []);
 
     const submit = async (e) => {
         e.preventDefault();
@@ -22,6 +27,15 @@ export default function Contact() {
         }
     };
 
+    const fullAddress = settings ? [
+        settings.address_line1,
+        settings.address_line2,
+        settings.landmark,
+        [settings.city, settings.state, settings.pincode].filter(Boolean).join(", "),
+    ].filter(Boolean).join(" • ") : "";
+    const hasAddress = settings && (settings.address_line1 || settings.city);
+    const contactEmail = settings?.contact_email || "drvishvapatel6298@gmail.com";
+
     return (
         <div data-testid="contact-page">
             <section className="container-page pt-16 lg:pt-24 pb-12 max-w-3xl">
@@ -36,12 +50,48 @@ export default function Contact() {
 
             <section className="container-page pb-24 grid lg:grid-cols-12 gap-10">
                 <div className="lg:col-span-5 space-y-4">
-                    <ContactCard Icon={Mail} title="Email" body="drvishvapatel6298@gmail.com" href="mailto:drvishvapatel6298@gmail.com" testid="contact-email" />
+                    <ContactCard Icon={Mail} title="Email" body={contactEmail} href={`mailto:${contactEmail}`} testid="contact-email" />
+                    {settings?.hours && (
+                        <ContactCard Icon={Clock} title="Clinic Hours" body={settings.hours} testid="contact-hours" />
+                    )}
                     <div className="card-soft p-7" data-testid="contact-location">
                         <MapPin size={22} className="text-brand-primary" strokeWidth={1.5} />
                         <h3 className="font-serif text-lg font-semibold text-brand-text mt-3">Clinic Location</h3>
-                        <p className="text-sm text-brand-textSecondary mt-2 leading-relaxed">Detailed clinic address coming soon. Google Maps will be embedded here once the location is finalised.</p>
-                        <div className="mt-4 aspect-[4/3] rounded-xl bg-brand-subtle flex items-center justify-center text-xs uppercase tracking-wider text-brand-textMuted">Map placeholder</div>
+                        {hasAddress ? (
+                            <>
+                                {settings.address_line1 && <p className="text-sm text-brand-text mt-2 leading-relaxed">{settings.address_line1}</p>}
+                                {settings.address_line2 && <p className="text-sm text-brand-text leading-relaxed">{settings.address_line2}</p>}
+                                {settings.landmark && <p className="text-sm text-brand-textSecondary leading-relaxed mt-1">{settings.landmark}</p>}
+                                {(settings.city || settings.state || settings.pincode) && (
+                                    <p className="text-sm text-brand-textSecondary leading-relaxed mt-1">
+                                        {[settings.city, settings.state, settings.pincode].filter(Boolean).join(", ")}
+                                    </p>
+                                )}
+                                {settings.maps_link && (
+                                    <a href={settings.maps_link} target="_blank" rel="noreferrer" className="btn-secondary !py-2 !px-5 text-xs mt-4" data-testid="contact-directions">
+                                        <Navigation size={14} /> Get Directions
+                                    </a>
+                                )}
+                            </>
+                        ) : (
+                            <p className="text-sm text-brand-textSecondary mt-2 leading-relaxed">Detailed clinic address coming soon.</p>
+                        )}
+                        {settings?.maps_embed_url ? (
+                            <div className="mt-4 aspect-[4/3] rounded-xl overflow-hidden border border-brand-primary/10">
+                                <iframe
+                                    title="Clinic location"
+                                    src={settings.maps_embed_url}
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                />
+                            </div>
+                        ) : (
+                            !hasAddress && <div className="mt-4 aspect-[4/3] rounded-xl bg-brand-subtle flex items-center justify-center text-xs uppercase tracking-wider text-brand-textMuted">Map placeholder</div>
+                        )}
                     </div>
                 </div>
 
@@ -85,17 +135,27 @@ export default function Contact() {
     );
 }
 
-const ContactCard = ({ Icon, title, body, href, testid }) => (
-    <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="card-soft p-6 flex items-start gap-4 hover:border-brand-primary/30" data-testid={testid}>
-        <div className="w-11 h-11 rounded-xl bg-brand-secondary text-brand-primary flex items-center justify-center shrink-0">
-            <Icon size={20} strokeWidth={1.5} />
-        </div>
-        <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-brand-textMuted">{title}</div>
-            <div className="font-serif text-lg text-brand-text font-semibold mt-1">{body}</div>
-        </div>
-    </a>
-);
+const ContactCard = ({ Icon, title, body, href, testid }) => {
+    const Inner = (
+        <>
+            <div className="w-11 h-11 rounded-xl bg-brand-secondary text-brand-primary flex items-center justify-center shrink-0">
+                <Icon size={20} strokeWidth={1.5} />
+            </div>
+            <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-brand-textMuted">{title}</div>
+                <div className="font-serif text-lg text-brand-text font-semibold mt-1 break-words">{body}</div>
+            </div>
+        </>
+    );
+    if (href) {
+        return (
+            <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="card-soft p-6 flex items-start gap-4 hover:border-brand-primary/30" data-testid={testid}>
+                {Inner}
+            </a>
+        );
+    }
+    return <div className="card-soft p-6 flex items-start gap-4" data-testid={testid}>{Inner}</div>;
+};
 
 const ContactField = ({ label, children }) => (
     <div>
