@@ -1,0 +1,134 @@
+{
+  "theme": "light",
+  "archetype": "1_organic_earthy",
+  "domain": "luxury_medical_proctology",
+  "brand": {
+    "name": "ProctoCare by Vishva",
+    "vibe": "Premium, personal, trustworthy, warm, clean, luxury healthcare",
+    "target_audience": "Patients in tier-2 cities seeking high-end specialist care"
+  },
+  "typography": {
+    "headings": {
+      "family": "Cormorant Garamond",
+      "import_url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap",
+      "rules": [
+        "tracking-tight",
+        "Never center by default, define explicit alignment",
+        "Use font-medium (500) or font-semibold (600) for elegance"
+      ],
+      "sizes": {
+        "h1": "text-4xl sm:text-5xl lg:text-6xl",
+        "h2": "text-3xl sm:text-4xl lg:text-5xl",
+        "h3": "text-2xl sm:text-3xl",
+        "h4": "text-xl sm:text-2xl"
+      }
+    },
+    "body": {
+      "family": "Outfit",
+      "import_url": "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap",
+      "rules": [
+        "leading-relaxed",
+        "text-base md:text-lg for primary body text"
+      ]
+    },
+    "labels": {
+      "rules": "uppercase, tracking-[0.2em], text-xs font-semibold text-teal-800/70"
+    }
+  },
+  "colors": {
+    "background": {
+      "main": "#FBFBF9",
+      "description": "Bone white / soft warm beige for a nurturing, non-clinical feel"
+    },
+    "surface": {
+      "card": "#FFFFFF",
+      "subtle": "#F2F4F3"
+    },
+    "brand": {
+      "primary": "#1A5B5E",
+      "primary_hover": "#134648",
+      "secondary": "#E8F0F0",
+      "accent": "#C9B69B"
+    },
+    "text": {
+      "primary": "#1B2421",
+      "secondary": "#51625D",
+      "muted": "#82958F"
+    },
+    "status": {
+      "emergency": "#B04242",
+      "success": "#2D7A5A"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing, generous padding, uncrowded layouts.",
+    "scale": "p-6, p-8, p-12, p-16, p-24",
+    "grids": {
+      "services": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+      "why_choose_us": "grid-cols-1 md:grid-cols-12 gap-8 (Bento 'Tetris' style)"
+    },
+    "borders": "subtle, 1px solid border-[#1A5B5E]/10"
+  },
+  "surfaces_and_micro_themes": {
+    "header": {
+      "type": "glassmorphism",
+      "classes": "backdrop-blur-xl bg-[#FBFBF9]/80 border-b border-[#1A5B5E]/10 sticky top-0 z-50"
+    },
+    "cards": {
+      "type": "neumorphism_crisp",
+      "classes": "bg-white rounded-2xl shadow-[0_8px_30px_rgb(26,91,94,0.04)] border border-[#1A5B5E]/5 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(26,91,94,0.08)] hover:-translate-y-1 p-8"
+    },
+    "buttons": {
+      "primary": "bg-[#1A5B5E] text-white hover:bg-[#134648] rounded-full px-8 py-3 transition-colors",
+      "secondary": "bg-[#E8F0F0] text-[#1A5B5E] hover:bg-[#D8E6E6] rounded-full px-8 py-3 transition-colors",
+      "emergency": "bg-[#B04242] text-white hover:bg-[#8F3333] rounded-full px-8 py-3 transition-colors animate-pulse"
+    }
+  },
+  "components": {
+    "ui_library": "shadcn/ui",
+    "icons": {
+      "library": "@phosphor-icons/react",
+      "weight": "duotone"
+    },
+    "forms": "Use Shadcn Form, Input, Select, Calendar, and Popover for the booking system.",
+    "tables": "Use Shadcn Table for the Admin Dashboard.",
+    "toast": "Use Sonner for booking confirmations."
+  },
+  "motion_and_interactions": {
+    "rules": [
+      "Smooth entrance animations for grid items (framer-motion staggered fade up)",
+      "Hover states must be explicitly defined (e.g. hover:text-white)",
+      "Use lenis for smooth scrolling to add a premium momentum feel"
+    ]
+  },
+  "media": {
+    "rules": "No placeholder images. Use provided URLs. Soft overlays over hero.",
+    "image_urls": {
+      "hero_background": {
+        "url": "https://images.pexels.com/photos/7605642/pexels-photo-7605642.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Elegant smooth warm beige texture for the hero background. MUST use overlay: bg-white/40 or bg-[#FBFBF9]/60 to ensure text contrast."
+      },
+      "doctor_consulting": {
+        "url": "https://images.pexels.com/photos/7578808/pexels-photo-7578808.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Warm, trustworthy doctor consulting a patient. Use in 'About Doctor' or 'Why Choose Us' sections."
+      },
+      "clinic_interior": {
+        "url": "https://images.unsplash.com/photo-1759262151080-e05ba1c6294f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwY2xpbmljJTIwaW50ZXJpb3IlMjBicmlnaHR8ZW58MHx8fHwxNzc3MTI5NzI2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Bright, modern premium clinic interior. Use for trust indicators or testimonials background."
+      }
+    }
+  },
+  "testing": {
+    "attributes": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case."
+  },
+  "instructions_to_main_agent": [
+    "Install @phosphor-icons/react and lenis.",
+    "Update tailwind.config.js with the custom colors: brand primary #1A5B5E, background #FBFBF9, accent #C9B69B.",
+    "Implement Cormorant Garamond for headings and Outfit for body text.",
+    "Build standard multi-page structure with React Router.",
+    "Dashboard should be a separate route (/admin) with high-density grid layouts using Archetype 4 rules (Swiss & High Contrast), but keeping the teal brand color.",
+    "In the Marketing pages, strictly follow the generous spacing (p-8, p-12) and avoid Shadcn Card containers unless heavily stripped and customized.",
+    "Implement Floating WhatsApp CTA and Sticky Book Appointment CTA.",
+    "Use standard pure HTML/Tailwind for marketing layouts and Shadcn for interactive logic (Forms, Calendars in booking)."
+  ]
+}
