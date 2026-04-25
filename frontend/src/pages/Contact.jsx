@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, Mail, MapPin, MessageCircle, Loader2, Check } from "lucide-react";
+import { Mail, MapPin, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import api, { formatApiError } from "../lib/api";
 
@@ -30,15 +30,13 @@ export default function Contact() {
                     We'd love to hear from you.
                 </h1>
                 <p className="mt-7 text-base md:text-lg text-brand-textSecondary leading-relaxed">
-                    Reach us by phone, WhatsApp, or use the form below. Every message is read and responded to personally.
+                    Send us an email or use the form below. Every message is read and responded to personally.
                 </p>
             </section>
 
             <section className="container-page pb-24 grid lg:grid-cols-12 gap-10">
                 <div className="lg:col-span-5 space-y-4">
-                    <ContactCard Icon={Phone} title="Call" body="+91 90000 00000" href="tel:+919000000000" testid="contact-phone" />
-                    <ContactCard Icon={MessageCircle} title="WhatsApp" body="+91 90000 00000" href="https://wa.me/919000000000" testid="contact-whatsapp" />
-                    <ContactCard Icon={Mail} title="Email" body="hello@proctocarebyvishva.com" href="mailto:hello@proctocarebyvishva.com" testid="contact-email" />
+                    <ContactCard Icon={Mail} title="Email" body="drvishvapatel6298@gmail.com" href="mailto:drvishvapatel6298@gmail.com" testid="contact-email" />
                     <div className="card-soft p-7" data-testid="contact-location">
                         <MapPin size={22} className="text-brand-primary" strokeWidth={1.5} />
                         <h3 className="font-serif text-lg font-semibold text-brand-text mt-3">Clinic Location</h3>
@@ -60,14 +58,9 @@ export default function Contact() {
                             <ContactField label="Name *">
                                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="contact-input" data-testid="contact-input-name" />
                             </ContactField>
-                            <div className="grid md:grid-cols-2 gap-5">
-                                <ContactField label="Email *">
-                                    <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="contact-input" data-testid="contact-input-email" />
-                                </ContactField>
-                                <ContactField label="Phone">
-                                    <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="contact-input" data-testid="contact-input-phone" />
-                                </ContactField>
-                            </div>
+                            <ContactField label="Email *">
+                                <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="contact-input" data-testid="contact-input-email" />
+                            </ContactField>
                             <ContactField label="Message *">
                                 <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="contact-input resize-none" data-testid="contact-input-message" />
                             </ContactField>

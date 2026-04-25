@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 export const Footer = () => (
     <footer className="bg-brand-primary text-white/90 mt-32" data-testid="site-footer">
@@ -42,9 +42,7 @@ export const Footer = () => (
             <div>
                 <h4 className="text-white text-sm font-semibold uppercase tracking-[0.2em] mb-5">Contact</h4>
                 <ul className="space-y-3 text-sm text-white/70">
-                    <li className="flex items-start gap-2"><Phone size={14} className="mt-1 shrink-0" /> <a href="tel:+919000000000" className="hover:text-white">+91 90000 00000</a></li>
-                    <li className="flex items-start gap-2"><MessageCircle size={14} className="mt-1 shrink-0" /> <a href="https://wa.me/919000000000" target="_blank" rel="noreferrer" className="hover:text-white">WhatsApp</a></li>
-                    <li className="flex items-start gap-2"><Mail size={14} className="mt-1 shrink-0" /> <a href="mailto:hello@proctocarebyvishva.com" className="hover:text-white">hello@proctocarebyvishva.com</a></li>
+                    <li className="flex items-start gap-2"><Mail size={14} className="mt-1 shrink-0" /> <a href="mailto:drvishvapatel6298@gmail.com" className="hover:text-white">drvishvapatel6298@gmail.com</a></li>
                     <li className="flex items-start gap-2"><MapPin size={14} className="mt-1 shrink-0" /> <span>Clinic location coming soon</span></li>
                 </ul>
             </div>

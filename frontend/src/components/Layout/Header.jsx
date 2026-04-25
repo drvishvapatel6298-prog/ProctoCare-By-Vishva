@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Mail } from "lucide-react";
 
 const navLinks = [
     { to: "/", label: "Home" },
@@ -48,11 +48,11 @@ export const Header = () => {
 
                 <div className="hidden lg:flex items-center gap-3">
                     <a
-                        href="tel:+919000000000"
+                        href="mailto:drvishvapatel6298@gmail.com"
                         className="flex items-center gap-2 text-sm text-brand-textSecondary hover:text-brand-primary transition-colors"
-                        data-testid="header-phone"
+                        data-testid="header-email"
                     >
-                        <Phone size={16} /> Call
+                        <Mail size={16} /> Email
                     </a>
                     <Link to="/book" className="btn-primary" data-testid="header-book-btn">
                         Book Appointment

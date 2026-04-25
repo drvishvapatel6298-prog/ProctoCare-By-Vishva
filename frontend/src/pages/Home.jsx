@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     ArrowRight, Stethoscope, HeartPulse, ShieldPlus, Sparkles, Calendar, Video,
-    Star, ShieldCheck, Award, UserCheck, Clock, Phone
+    Star, ShieldCheck, Award, UserCheck, Clock, Mail
 } from "lucide-react";
 import api from "../lib/api";
 
@@ -276,8 +276,8 @@ export default function Home() {
                         <Link to="/book" className="bg-white text-brand-primary hover:bg-brand-bg rounded-full px-8 py-3 text-sm font-medium transition-colors inline-flex items-center gap-2" data-testid="cta-book-btn">
                             Book Appointment <ArrowRight size={16} />
                         </Link>
-                        <a href="tel:+919000000000" className="border border-white/30 text-white hover:bg-white hover:text-brand-primary rounded-full px-8 py-3 text-sm font-medium transition-colors inline-flex items-center gap-2">
-                            <Phone size={16} /> Call Now
+                        <a href="mailto:drvishvapatel6298@gmail.com" className="border border-white/30 text-white hover:bg-white hover:text-brand-primary rounded-full px-8 py-3 text-sm font-medium transition-colors inline-flex items-center gap-2">
+                            <Mail size={16} /> Email Us
                         </a>
                     </div>
                 </div>
